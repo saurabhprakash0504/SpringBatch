@@ -1,0 +1,5 @@
+flatFiles:
+   directories:
+      input: src/main/resources/input/
+      skip: src/main/resources/input/
+   validInputFileNameExpression: FlatFile\d{6}
