@@ -24,7 +24,6 @@ import org.springframework.batch.core.BatchStatus;
 import com.sample.tasklet.CheckFileName;
 import com.sample.utils.FileUtils;
 
-import jdk.internal.jline.internal.Log;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
@@ -44,32 +43,41 @@ public class FlatFileController {
 	private String flatFileNameExpression;
 	
 	public FlatFileController(final ConfigurableApplicationContext ctx) {
+		super();
 		this.ctx=ctx;
 	}
 	
 	@GetMapping("/triggerFlatFile")
 	public void runFlatFile() throws ParseException, IOException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException, JobParametersInvalidException {
 		JobLauncher jobLauncher = ctx.getBean(JobLauncher.class);
-		Job pergeFileJob =ctx.getBean("purgeFileJob",Job.class);
+	//	JobParameters jobParameters = getDefaultJobParameter();
+	//	Job purgeFileJob =ctx.getBean("purgeFileJob",Job.class);
 		Job flatFileJob = ctx.getBean("flatFileJob", Job.class);
 		
-		JobExecution purgeFileExecution = jobLauncher.run(pergeFileJob, new JobParameters());
-		BatchStatus purgeFileBatchStatus = purgeFileExecution.getStatus();
+	//	JobExecution purgeFileExecution = jobLauncher.run(purgeFileJob, new JobParameters());
+	//	BatchStatus purgeFileBatchStatus = purgeFileExecution.getStatus();
 		
 		checkFileName().run();
-		final Resource[] resources = getSortedResources();
-		
+		//final Resource[] resources = getSortedResources();
+		Resource[] resources = getInputResources();
+
 		for(final Resource resource : resources) {
-			Log.debug("Running Job for file ");
+			log.debug("Running Job for file ");
 			JobParameters jobParameters = getJobParam(resource);
 			JobExecution flatFileJobExecution = jobLauncher.run(flatFileJob, jobParameters);
 			org.springframework.batch.core.BatchStatus flatFileBatchStatus = flatFileJobExecution.getStatus();
 		}
 	}
 
-	private JobParameters getJobParam(Resource resource) throws IOException {
-		return new JobParametersBuilder().addString(
-"fileUrl", resource.getURI().toString()).toJobParameters();
+	public JobParameters getDefaultJobParameter(){
+		return new JobParametersBuilder().addLong("time", System.currentTimeMillis()).toJobParameters();
+	}
+
+	public JobParameters getJobParam(Resource resource) throws IOException {
+		return new JobParametersBuilder()
+				.addLong("time", System.currentTimeMillis())
+				.addString("fileUrl", resource.getURI().toString())
+				.toJobParameters();
 	}
 
 	private Resource[] getSortedResources() throws ParseException, IOException {
@@ -78,7 +86,7 @@ public class FlatFileController {
 		Resource[] sortedResources = FileUtils.sortFileByDateAndTime(startOfDate, endOfDate, getInputResources());
 		
 		for(final Resource resource : sortedResources) {
-			Log.debug("fileName :: {} ", resource.getFilename());
+			log.debug("fileName :: {} ", resource.getFilename());
 		}
 		
 		return sortedResources;

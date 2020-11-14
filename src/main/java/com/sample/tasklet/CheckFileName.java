@@ -5,7 +5,6 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import jdk.internal.jline.internal.Log;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -18,11 +17,9 @@ public class CheckFileName {
 	String flatFileNameExpression;
 	
 	public CheckFileName(String flatFileInputFolder, String flatFileSkipFolder, String flatFileNameExpression) {
-		
 		this.flatFileInputFolder = flatFileInputFolder;
 		this.flatFileNameExpression = flatFileNameExpression;
-		this.flatFileSkipFolder = flatFileNameExpression;
-		
+		this.flatFileSkipFolder = flatFileSkipFolder;
 	}
 	
 	public void run() {
@@ -31,9 +28,9 @@ public class CheckFileName {
 			String fileName = file.getName();
 			Matcher matcher = pattern.matcher(fileName);
 			if(matcher.matches()) {
-				Log.info("fileName matches {} ",file.getName());
+				log.info("fileName matches {} ",file.getName());
 			}else {
-				Log.warn("Invalid fileName {} ", file.getName());
+				log.warn("Invalid fileName {} ", file.getName());
 				file.renameTo(moveFileInSkipDir(flatFileSkipFolder, file));
 			}
 		}

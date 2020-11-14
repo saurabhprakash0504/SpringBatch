@@ -1,0 +1,55 @@
+flatFiles:
+   directories:
+      input: src/main/resources/input/
+      skip: src/main/resources/skip/
+      output: src/main/resources/output/
+      processing: src/main/resources/processing/
+      sequence: src/main/resources/sequence/
+      inputArchieve: src/main/resources/inputArcieve/
+      outputArchieve: src/main/resources/outputArcheieve/
+   sequenceFile: src/main/resources/sequence/sequence.properties
+   retryLimit: 4
+   validInputFileNameExpression: FlatFile\d{6}
+
+flatfiles:
+   file-layout:
+      headerPattern: '00.*'
+      headerLength: 16
+      headerField:
+         - name: recordType
+           start: 1
+           end: 2
+         - name: date
+           start: 3
+           end: 10
+         - name: sequenceNumber
+           start: 11
+           end: 16
+      trailerPattern: '93.*'
+      trailerLength: 14
+      trailerField:
+         - name: dataType
+           start: 1
+           end: 2
+         - name: recordCount
+           start: 3
+           end: 14
+      detailPattern: '01.*'
+      detailLength: 27
+      detailField:
+        - name: recordType
+          start: 1
+          end: 2
+        - name: firstName
+          start: 3
+          end: 11
+        - name: lastName
+          start: 12
+          end: 20
+        - name: postCode
+          start: 21
+          end: 22
+        - name: city
+          start: 23
+          end: 27
+
