@@ -18,5 +18,4 @@ git rebase --continue
 git status -s
 git push --force
 
-
 git stash save --keep-index --include-untracked
